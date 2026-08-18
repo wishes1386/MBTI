@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>和風 · MBTI 性格鑑定</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Noto Serif SC', 'Hiragino Mincho ProN', 'Yu Mincho', 'MS Mincho', serif;
+            background: linear-gradient(145deg, #f4efe6 0%, #e8dfd1 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: radial-gradient(circle at 20% 30%, rgba(180,160,140,0.05) 0%, transparent 30%);
+        }
+        #app {
+            max-width: 680px;
+            width: 100%;
+            background: rgba(255, 250, 240, 0.92);
+            backdrop-filter: blur(4px);
+            border-radius: 16px;
+            padding: 32px 30px 28px;
+            box-shadow: 0 15px 40px -10px rgba(60, 40, 20, 0.25), inset 0 0 0 1px rgba(200, 180, 160, 0.3);
+            border-left: 6px solid #8B0000;
+            border-right: 1px solid #d4c9b8;
+            position: relative;
+        }
+        #app::before {
+            content: "⚪";
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            font-size: 32px;
+            color: #8B0000;
+            opacity: 0.2;
+            transform: rotate(15deg);
+        }
+        .title-wrap {
+            text-align: center;
+            border-bottom: 2px dashed #c4b5a0;
+            padding-bottom: 16px;
+            margin-bottom: 22px;
+        }
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #8B0000;
+            letter-spacing: 6px;
+            text-shadow: 1px 1px 0 rgba(139,0,0,0.1);
+        }
+        .sub {
+            color: #6d5c4b;
+            font-size: 14px;
+            letter-spacing: 4px;
+            margin-top: 4px;
+        }
+        .sub::before { content: "—— "; }
+        .sub::after { content: " ——"; }
+
+        #progress {
+            background: #d4cdc0;
+            border-radius: 40px;
+            height: 8px;
+            margin-bottom: 6px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background: #2E4A35;
+            border-radius: 40px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 6px rgba(46,74,53,0.3);
+        }
+        #progressText {
+            text-align: right;
+            font-size: 13px;
+            color: #7b6b5a;
+            margin-top: 2px;
+            letter-spacing: 1px;
+        }
+        #questionText {
+            font-size: 21px;
+            font-weight: 600;
+            color: #1A2A3A;
+            line-height: 1.7;
+            margin: 24px 0 24px;
+            min-height: 60px;
+            border-left: 4px solid #c4b5a0;
+            padding-left: 16px;
+        }
+        #options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .opt-btn {
+            background: #fcf9f4;
+            border: 2px solid #b8aa98;
+            border-radius: 8px;
+            padding: 16px 22px;
+            font-size: 17px;
+            font-weight: 500;
+            color: #2c241c;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Noto Serif SC', serif;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .opt-btn:hover {
+            border-color: #8B0000;
+            background: #fffbf5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139,0,0,0.12);
+        }
+        .opt-btn:active { transform: scale(0.97); }
+        .opt-btn .tag {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fcf9f4;
+            background: #1A2A3A;
+            border-radius: 4px;
+            padding: 0 12px;
+            margin-right: 16px;
+            letter-spacing: 2px;
+            line-height: 1.8;
+        }
+        .opt-btn .tag-ei { background: #8B0000; } 
+        .opt-btn .tag-sn { background: #2E4A35; } 
+        .opt-btn .tag-tf { background: #A88B6C; } 
+        .opt-btn .tag-jp { background: #1A2A3A; } 
+
+        #result {
+            display: none;
+            margin-top: 12px;
+            background: #f8f3ea;
+            padding: 24px 20px 20px;
+            border-radius: 12px;
+            border: 1px solid #d4c9b8;
+            box-shadow: inset 0 0 20px rgba(180,160,140,0.1);
+            position: relative;
+        }
+        #result::before {
+            content: "▼ 卷軸";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #f4efe6;
+            padding: 0 12px;
+            color: #8B0000;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        #resultType {
+            font-size: 38px;
+            font-weight: 800;
+            text-align: center;
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #8B0000, #C5963B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding: 8px 0;
+        }
+        .dimension-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 4px;
+            margin: 4px 0;
+            border-bottom: 1px dotted #d4cdc0;
+        }
+        .dimension-row .left, .dimension-row .right {
+            font-weight: 600;
+            color: #3d3228;
+            font-size: 15px;
+            min-width: 20px;
+        }
+        .dimension-row .bar-bg {
+            flex: 1;
+            height: 6px;
+            background: #d4cdc0;
+            border-radius: 20px;
+            margin: 0 12px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .dimension-row .bar-fill {
+            height: 100%;
+            background: #2E4A35;
+            border-radius: 20px;
+            transition: width 0.8s ease;
+        }
+        #desc {
+            background: #fcf9f4;
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin: 16px 0 6px;
+            border-left: 6px solid #8B0000;
+            color: #2c241c;
+            line-height: 1.9;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+        #resetBtn {
+            display: none;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            background: #1A2A3A;
+            color: #f4efe6;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 18px;
+            font-family: 'Noto Serif SC', serif;
+            letter-spacing: 6px;
+            border: 1px solid #3d3228;
+        }
+        #resetBtn:hover { background: #0f1a22; transform: scale(1.01); box-shadow: 0 4px 12px rgba(26,42,58,0.3); }
+        @media (max-width: 480px) {
+            #app { padding: 20px 16px; }
+            #questionText { font-size: 18px; }
+            .opt-btn { padding: 14px 16px; font-size: 15px; }
+            h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="title-wrap">
+        <h1>🎌 MBTI 性格鑑定</h1>
+        <div class="sub">16 題 · 請安靜地回答</div>
+    </div>
+
+    <div id="progress"><div id="progressBar"></div></div>
+    <div id="progressText">第 1 題 / 共 16 題</div>
+
+    <div id="questionText"></div>
+    <div id="options"></div>
+
+    <div id="result">
+        <div id="resultType"></div>
+        <div id="dimensions"></div>
+        <div id="desc"></div>
+    </div>
+    <button id="resetBtn">🔄 重新鑑定</button>
+</div>
+
+<script>
+    // ----- 題庫（全部繁體中文） -----
+    const questions = [
+        { dim: 'EI', q: '社交場合中，你通常：', opts: ['主動與人交談', '等待別人來搭話'], code: ['E','I'] },
+        { dim: 'EI', q: '週末你更喜歡：', opts: ['參加聚會或活動', '在家安靜休息'], code: ['E','I'] },
+        { dim: 'EI', q: '與人交流時，你偏向：', opts: ['多說少聽', '多聽少說'], code: ['E','I'] },
+        { dim: 'EI', q: '工作環境你偏好：', opts: ['團隊協作', '獨立作業'], code: ['E','I'] },
+
+        { dim: 'SN', q: '你更關注：', opts: ['現實細節與事實', '未來可能性與構想'], code: ['S','N'] },
+        { dim: 'SN', q: '你更喜歡處理：', opts: ['具體明確的事務', '抽象理論概念'], code: ['S','N'] },
+        { dim: 'SN', q: '你更相信：', opts: ['親身實踐經驗', '直覺靈感'], code: ['S','N'] },
+        { dim: 'SN', q: '你更擅長：', opts: ['處理當下事務', '構想未來場景'], code: ['S','N'] },
+
+        { dim: 'TF', q: '做決定時，你更依賴：', opts: ['邏輯分析', '個人感受'], code: ['T','F'] },
+        { dim: 'TF', q: '你更看重：', opts: ['公平公正', '和諧共處'], code: ['T','F'] },
+        { dim: 'TF', q: '你更傾向：', opts: ['指出問題', '給予鼓勵'], code: ['T','F'] },
+        { dim: 'TF', q: '你更擅長：', opts: ['辯論觀點', '理解他人情緒'], code: ['T','F'] },
+
+        { dim: 'JP', q: '你更喜歡：', opts: ['制定計劃並按計劃執行', '靈活應變隨遇而安'], code: ['J','P'] },
+        { dim: 'JP', q: '你更傾向：', opts: ['盡早做決定', '保持開放選項'], code: ['J','P'] },
+        { dim: 'JP', q: '生活風格更偏向：', opts: ['有條不紊', '隨意自在'], code: ['J','P'] },
+        { dim: 'JP', q: '你更適應：', opts: ['有明確期限的工作', '無明確期限的工作'], code: ['J','P'] }
+    ];
+
+    const descriptions = {
+        'ISTJ': '沉靜的責任者。可靠且踏實，邏輯嚴謹，善於執行。',
+        'ISFJ': '溫和體貼，責任感強，樂於奉獻，關懷他人。',
+        'INFJ': '洞察力深，有信念，善於規劃並引導他人成長。',
+        'INTJ': '獨立的戰略家，長於規劃，追求知識與能力極致。',
+        'ISTP': '冷靜務實，擅長動手解決問題，觀察敏銳。',
+        'ISFP': '安靜敏感，富有藝術感，珍惜個人空間與自然。',
+        'INFP': '理想主義，忠誠內省，善於理解並療癒他人。',
+        'INTP': '邏輯嚴密，好奇心強，善於抽象思考與理論建構。',
+        'ESTP': '靈活精力旺盛，善於社交，喜歡冒險與即興。',
+        'ESFP': '外向友善，熱情開朗，享受當下並鼓舞他人。',
+        'ENFP': '熱情富有想像力，善於發現可能性，激勵人心。',
+        'ENTP': '聰明善辯，挑戰常規，充滿創意與企業家精神。',
+        'ESTJ': '果斷務實，組織力強，重視效率與執行力。',
+        'ESFJ': '熱心友善，重視和諧，合作能力出眾。',
+        'ENFJ': '魅力領導者，善於激勵他人，關注他人成長。',
+        'ENTJ': '果斷有魄力，善於戰略策劃，追求目標實現。'
+    };
+
+    let current = 0;
+    let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+    const total = questions.length;
+
+    const questionText = document.getElementById('questionText');
+    const optionsDiv = document.getElementById('options');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const resultDiv = document.getElementById('result');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultType = document.getElementById('resultType');
+    const dimensionsDiv = document.getElementById('dimensions');
+    const descDiv = document.getElementById('desc');
+
+    function renderQuestion() {
+        if (current >= total) { showResult(); return; }
+        const q = questions[current];
+        questionText.textContent = `第 ${current+1} 題 · ${q.q}`;
+        optionsDiv.innerHTML = '';
+        q.opts.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            const tag = q.code[idx];
+            let tagClass = '';
+            if (q.dim === 'EI') tagClass = 'tag-ei';
+            else if (q.dim === 'SN') tagClass = 'tag-sn';
+            else if (q.dim === 'TF') tagClass = 'tag-tf';
+            else if (q.dim === 'JP') tagClass = 'tag-jp';
+            btn.innerHTML = `<span class="tag ${tagClass}">${tag}</span> ${opt}`;
+            btn.addEventListener('click', () => {
+                scores[tag] = (scores[tag] || 0) + 1;
+                current++;
+                updateProgress();
+                renderQuestion();
+            });
+            optionsDiv.appendChild(btn);
+        });
+        resultDiv.style.display = 'none';
+        resetBtn.style.display = 'none';
+        optionsDiv.style.display = 'flex';
+        questionText.style.display = 'block';
+    }
+
+    function updateProgress() {
+        const pct = Math.min(100, (current / total) * 100);
+        progressBar.style.width = pct + '%';
+        progressText.textContent = `第 ${Math.min(current+1, total)} 題 / 共 ${total} 題`;
+    }
+
+    function showResult() {
+        optionsDiv.style.display = 'none';
+        questionText.style.display = 'none';
+        resultDiv.style.display = 'block';
+        resetBtn.style.display = 'block';
+
+        const dims = ['EI','SN','TF','JP'];
+        let typeStr = '';
+        let dimHtml = '';
+        dims.forEach(d => {
+            const [a, b] = d.split('');
+            const totalScore = scores[a] + scores[b];
+            const pctA = totalScore ? Math.round((scores[a]/totalScore)*100) : 50;
+            const pctB = 100 - pctA;
+            const chosen = pctA >= 50 ? a : b;
+            typeStr += chosen;
+            dimHtml += `
+                <div class="dimension-row">
+                    <span class="left">${a}</span>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width:${pctA}%; background:${pctA>=50?'#2E4A35':'#A88B6C'};"></div>
+                    </div>
+                    <span class="right">${b}</span>
+                    <span style="font-size:13px; font-weight:600; margin-left:6px; min-width:36px; color:#3d3228;">${pctA}%</span>
+                </div>
+            `;
+        });
+        dimensionsDiv.innerHTML = dimHtml;
+        resultType.textContent = `✦ ${typeStr} ✦`;
+        const desc = descriptions[typeStr] || '你的性格獨特，無法簡單歸類。';
+        descDiv.textContent = desc;
+        progressBar.style.width = '100%';
+        progressText.textContent = '完成';
+    }
+
+    resetBtn.addEventListener('click', () => {
+        scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+        current = 0;
+        resultDiv.style.display = 'none';
+        resetBtn.style.display = 'none';
+        optionsDiv.style.display = 'flex';
+        questionText.style.display = 'block';
+        updateProgress();
+        renderQuestion();
+    });
+
+    renderQuestion();
+    updateProgress();
+</script>
+</body>
+</html>
