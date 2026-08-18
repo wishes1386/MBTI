@@ -290,6 +290,91 @@
         .source-credit a {
             color: #8B0000;
         }
+        #modeSelect {
+            margin-bottom: 22px;
+        }
+        .mode-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #3d3228;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+        .mode-sub {
+            text-align: center;
+            font-size: 13px;
+            color: #7b6b5a;
+            margin-bottom: 14px;
+        }
+        .mode-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .mode-option {
+            background: #fcf9f4;
+            border: 2px solid #b8aa98;
+            border-radius: 8px;
+            padding: 14px 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c241c;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+            transition: 0.2s;
+        }
+        .mode-option:hover {
+            border-color: #8B0000;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(139,0,0,0.08);
+        }
+        .mode-option small {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #7b6b5a;
+            margin-top: 4px;
+            letter-spacing: 0;
+        }
+        .scale-btn {
+            text-align: center;
+            justify-content: center;
+        }
+        .scale-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c241c;
+        }
+        .result-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        #resetBtn {
+            margin-top: 0;
+        }
+        #switchBtn {
+            display: none;
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #b8aa98;
+            background: #fcf9f4;
+            color: #3d3228;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Noto Serif SC', serif;
+            letter-spacing: 2px;
+        }
+        #switchBtn:hover {
+            border-color: #8B0000;
+            background: #fffbf5;
+        }
         @media (max-width: 480px) {
             #app { padding: 20px 16px; }
             #questionText { font-size: 18px; }
@@ -302,7 +387,16 @@
 <div id="app">
     <div class="title-wrap">
         <h1>🎌 MBTI 性格鑑定</h1>
-        <div class="sub">36 題 · 請安靜地回答</div>
+        <div class="sub">快速版 36 題 · 完整版 60 題</div>
+    </div>
+
+    <div id="modeSelect">
+        <div class="mode-title">選擇測驗版本</div>
+        <div class="mode-sub">快速版分析四大維度；完整版另含自信/謹慎傾向</div>
+        <div class="mode-toggle">
+            <button class="mode-option" data-mode="quick">快速版<small>36 題 · 二選一</small></button>
+            <button class="mode-option" data-mode="full">完整版<small>60 題 · 五級量表</small></button>
+        </div>
     </div>
 
     <div id="progress"><div id="progressBar"></div></div>
@@ -317,8 +411,11 @@
         <div id="desc"></div>
         <div id="groups"></div>
     </div>
-    <button id="resetBtn">🔄 重新鑑定</button>
-    <div class="source-credit">題目靈感來源：<a href="https://mbtiusa.com/test" target="_blank" rel="noopener">MBTI USA</a></div>
+    <div class="result-actions">
+        <button id="resetBtn">🔄 重新鑑定</button>
+        <button id="switchBtn">⇄ 切換測驗</button>
+    </div>
+    <div class="source-credit">題目靈感來源：<a href="https://mbtiusa.com/test" target="_blank" rel="noopener">MBTI USA</a>、<a href="https://www.16personalities.com/free-personality-test" target="_blank" rel="noopener">16Personalities</a></div>
 </div>
 
 <script>
@@ -369,6 +466,73 @@
         { dim: 'JP', q: '你傾向盡量保持選項開放，直到不得不決定的最後一刻。', opts: ['保持開放', '早點定案'], code: ['P','J'] }
     ];
 
+    const scaleQuestions = [
+        { type: 'scale', dim: 'EI', q: '我喜歡在人群中成為焦點。', agree: 'E' },
+        { type: 'scale', dim: 'EI', q: '長時間安靜獨處後，我會想找人聊聊。', agree: 'E' },
+        { type: 'scale', dim: 'EI', q: '認識新朋友時，我通常是先開口的一方。', agree: 'E' },
+        { type: 'scale', dim: 'EI', q: '我常需要透過交談來整理想法。', agree: 'E' },
+        { type: 'scale', dim: 'EI', q: '週末完全沒有社交活動，會讓我覺得無聊。', agree: 'E' },
+        { type: 'scale', dim: 'EI', q: '身處熱鬧場合時，我反而更有精神。', agree: 'E' },
+        { type: 'scale', dim: 'EI', q: '開口前，我習慣先在自己腦中把話想清楚。', agree: 'I' },
+        { type: 'scale', dim: 'EI', q: '參加聚會後，我需要獨處一段時間恢復。', agree: 'I' },
+        { type: 'scale', dim: 'EI', q: '比起大型聚會，我更喜歡少數人的深度交談。', agree: 'I' },
+        { type: 'scale', dim: 'EI', q: '在陌生環境裡，我習慣先觀察再參與。', agree: 'I' },
+        { type: 'scale', dim: 'EI', q: '我很享受獨處，很少因此感到寂寞。', agree: 'I' },
+        { type: 'scale', dim: 'EI', q: '與其主動約人，我比較常等待別人來約我。', agree: 'I' },
+
+        { type: 'scale', dim: 'SN', q: '我容易記得具體數字與細節。', agree: 'S' },
+        { type: 'scale', dim: 'SN', q: '我比較相信親眼見過或親身做過的事。', agree: 'S' },
+        { type: 'scale', dim: 'SN', q: '做事前，我喜歡先確認清楚步驟。', agree: 'S' },
+        { type: 'scale', dim: 'SN', q: '描述事情時，我重視實際發生什麼。', agree: 'S' },
+        { type: 'scale', dim: 'SN', q: '我更喜歡熟悉且可預測的做法。', agree: 'S' },
+        { type: 'scale', dim: 'SN', q: '比起抽象理論，實際示範更能讓我理解。', agree: 'S' },
+        { type: 'scale', dim: 'SN', q: '我常在腦中想像各種未來可能性。', agree: 'N' },
+        { type: 'scale', dim: 'SN', q: '我對象徵、比喻和隱含意義特別有興趣。', agree: 'N' },
+        { type: 'scale', dim: 'SN', q: '我喜歡把不同領域的想法連結起來。', agree: 'N' },
+        { type: 'scale', dim: 'SN', q: '我對事情可能是什麼，比現在是什麼更有興趣。', agree: 'N' },
+        { type: 'scale', dim: 'SN', q: '即使新點子還沒驗證，也會讓我興奮。', agree: 'N' },
+        { type: 'scale', dim: 'SN', q: '我常忽略細節，只記得整體方向。', agree: 'N' },
+
+        { type: 'scale', dim: 'TF', q: '做決定時，我優先考慮事實與後果。', agree: 'T' },
+        { type: 'scale', dim: 'TF', q: '我認為直接指出問題，比顧慮感受更重要。', agree: 'T' },
+        { type: 'scale', dim: 'TF', q: '衝突中，我重視道理是否站得住腳。', agree: 'T' },
+        { type: 'scale', dim: 'TF', q: '給建議時，我傾向講重點，不特別修飾語氣。', agree: 'T' },
+        { type: 'scale', dim: 'TF', q: '面對不同意見，我會先分析對方論點。', agree: 'T' },
+        { type: 'scale', dim: 'TF', q: '我認為公平比和諧更需要優先維護。', agree: 'T' },
+        { type: 'scale', dim: 'TF', q: '做決定時，我會先考慮大家的心情。', agree: 'F' },
+        { type: 'scale', dim: 'TF', q: '對方難過時，我寧可先安慰，而不是急著解決問題。', agree: 'F' },
+        { type: 'scale', dim: 'TF', q: '我常憑「感覺對不對」來判斷事情。', agree: 'F' },
+        { type: 'scale', dim: 'TF', q: '回饋時，我會刻意選擇比較溫柔的說法。', agree: 'F' },
+        { type: 'scale', dim: 'TF', q: '我容易記得別人對我的態度與溫度。', agree: 'F' },
+        { type: 'scale', dim: 'TF', q: '和諧的人際關係，比爭出對錯更重要。', agree: 'F' },
+
+        { type: 'scale', dim: 'JP', q: '我喜歡先把計畫排好再行動。', agree: 'J' },
+        { type: 'scale', dim: 'JP', q: '事情提早完成，會讓我覺得安心。', agree: 'J' },
+        { type: 'scale', dim: 'JP', q: '我會依照清單逐一完成任務。', agree: 'J' },
+        { type: 'scale', dim: 'JP', q: '約定時間前，我習慣提早準備。', agree: 'J' },
+        { type: 'scale', dim: 'JP', q: '行程被打亂時，我會想辦法趕快恢復原狀。', agree: 'J' },
+        { type: 'scale', dim: 'JP', q: '我偏好明確的截止期限。', agree: 'J' },
+        { type: 'scale', dim: 'JP', q: '我喜歡保留臨時改變的空間。', agree: 'P' },
+        { type: 'scale', dim: 'JP', q: '隨性的安排常常帶給我樂趣。', agree: 'P' },
+        { type: 'scale', dim: 'JP', q: '我常在截止日前才衝刺完成。', agree: 'P' },
+        { type: 'scale', dim: 'JP', q: '計畫太多反而讓我感到壓力。', agree: 'P' },
+        { type: 'scale', dim: 'JP', q: '比起按表操課，我更享受當下的靈感。', agree: 'P' },
+        { type: 'scale', dim: 'JP', q: '最後一刻的改變通常難不倒我。', agree: 'P' },
+
+        { type: 'scale', dim: 'AT', q: '面對壓力時，我通常能保持沉著。', agree: 'A' },
+        { type: 'scale', dim: 'AT', q: '我很少因為別人的批評而動搖。', agree: 'A' },
+        { type: 'scale', dim: 'AT', q: '我對自己的決定有把握。', agree: 'A' },
+        { type: 'scale', dim: 'AT', q: '失誤之後，我能很快放下並繼續前進。', agree: 'A' },
+        { type: 'scale', dim: 'AT', q: '我通常認為事情最終會往好的方向發展。', agree: 'A' },
+        { type: 'scale', dim: 'AT', q: '競爭場合會讓我更有幹勁。', agree: 'A' },
+        { type: 'scale', dim: 'AT', q: '我常在意自己是否讓別人失望。', agree: 'T' },
+        { type: 'scale', dim: 'AT', q: '小事出錯時，我也會反覆回想。', agree: 'T' },
+        { type: 'scale', dim: 'AT', q: '我很容易感受到壓力與焦慮。', agree: 'T' },
+        { type: 'scale', dim: 'AT', q: '別人對我的看法，會明顯影響我的心情。', agree: 'T' },
+        { type: 'scale', dim: 'AT', q: '我常懷疑自己剛才的決定是否正確。', agree: 'T' },
+        { type: 'scale', dim: 'AT', q: '即使表現不差，我仍會擔心下一次失敗。', agree: 'T' }
+    ];
+
     const descriptions = {
         'ISTJ': '沉靜的責任者。可靠且踏實，邏輯嚴謹，善於執行。',
         'ISFJ': '溫和體貼，責任感強，樂於奉獻，關懷他人。',
@@ -392,7 +556,8 @@
         EI: '能量來源：外向（E）對比內向（I）——看你習慣從外界互動還是獨處獲得能量。',
         SN: '接收資訊：實感（S）對比直覺（N）——看你著重具體細節還是抽象的大方向。',
         TF: '決策依據：理性（T）對比感性（F）——看你做決定時依據客觀邏輯還是人際感受。',
-        JP: '生活方式：系統（J）對比彈性（P）——看你喜歡按部就班的計畫還是隨性應變。'
+        JP: '生活方式：系統（J）對比彈性（P）——看你喜歡按部就班的計畫還是隨性應變。',
+        AT: '自我認同：自信（A）對比謹慎（T）——看你面對壓力與批評時，傾向穩定自信還是容易自我檢視。'
     };
 
     const groups = [
@@ -403,25 +568,84 @@
     ];
 
     let current = 0;
-    let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
-    const total = questions.length;
+    let scores = {
+        EI: { E:0, I:0 },
+        SN: { S:0, N:0 },
+        TF: { T:0, F:0 },
+        JP: { J:0, P:0 },
+        AT: { A:0, T:0 }
+    };
+    let activeQuestions = [];
+    let currentMode = null;
 
     const questionText = document.getElementById('questionText');
     const optionsDiv = document.getElementById('options');
+    const progressDiv = document.getElementById('progress');
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
+    const modeSelect = document.getElementById('modeSelect');
     const resultDiv = document.getElementById('result');
     const resetBtn = document.getElementById('resetBtn');
+    const switchBtn = document.getElementById('switchBtn');
     const resultType = document.getElementById('resultType');
     const dimensionsDiv = document.getElementById('dimensions');
     const descDiv = document.getElementById('desc');
     const groupsDiv = document.getElementById('groups');
 
+    function startQuiz(mode) {
+        currentMode = mode;
+        activeQuestions = mode === 'quick' ? questions : scaleQuestions;
+        current = 0;
+        scores = {
+            EI: { E:0, I:0 },
+            SN: { S:0, N:0 },
+            TF: { T:0, F:0 },
+            JP: { J:0, P:0 },
+            AT: { A:0, T:0 }
+        };
+        modeSelect.style.display = 'none';
+        progressDiv.style.display = 'block';
+        resultDiv.style.display = 'none';
+        resetBtn.style.display = 'none';
+        switchBtn.style.display = 'none';
+        optionsDiv.style.display = 'flex';
+        questionText.style.display = 'block';
+        updateProgress();
+        renderQuestion();
+    }
+
+    function showModeSelect() {
+        currentMode = null;
+        activeQuestions = [];
+        modeSelect.style.display = 'block';
+        progressDiv.style.display = 'none';
+        questionText.style.display = 'none';
+        optionsDiv.style.display = 'none';
+        resultDiv.style.display = 'none';
+        resetBtn.style.display = 'none';
+        switchBtn.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressText.textContent = '';
+    }
+
     function renderQuestion() {
-        if (current >= total) { showResult(); return; }
-        const q = questions[current];
+        if (current >= activeQuestions.length) { showResult(); return; }
+        const q = activeQuestions[current];
         questionText.textContent = `第 ${current+1} 題 · ${q.q}`;
         optionsDiv.innerHTML = '';
+        if (q.type === 'scale') {
+            renderScaleQuestion(q);
+        } else {
+            renderChoiceQuestion(q);
+        }
+        resultDiv.style.display = 'none';
+        resetBtn.style.display = 'none';
+        switchBtn.style.display = 'none';
+        optionsDiv.style.display = 'flex';
+        questionText.style.display = 'block';
+    }
+
+    function renderChoiceQuestion(q) {
         q.opts.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'opt-btn';
@@ -433,20 +657,37 @@
             else if (q.dim === 'JP') tagClass = 'tag-jp';
             btn.innerHTML = `<span class="tag ${tagClass}">${tag}</span> ${opt}`;
             btn.addEventListener('click', () => {
-                scores[tag] = (scores[tag] || 0) + 1;
+                scores[q.dim][tag] += 1;
                 current++;
                 updateProgress();
                 renderQuestion();
             });
             optionsDiv.appendChild(btn);
         });
-        resultDiv.style.display = 'none';
-        resetBtn.style.display = 'none';
-        optionsDiv.style.display = 'flex';
-        questionText.style.display = 'block';
+    }
+
+    function renderScaleQuestion(q) {
+        const labels = ['非常不同意', '不同意', '中立', '同意', '非常同意'];
+        const weights = [0, 0.25, 0.5, 0.75, 1];
+        const opposite = q.agree === q.dim[0] ? q.dim[1] : q.dim[0];
+        labels.forEach((label, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn scale-btn';
+            btn.innerHTML = `<span class="scale-label">${label}</span>`;
+            btn.addEventListener('click', () => {
+                const weight = weights[idx];
+                scores[q.dim][q.agree] += weight;
+                scores[q.dim][opposite] += 1 - weight;
+                current++;
+                updateProgress();
+                renderQuestion();
+            });
+            optionsDiv.appendChild(btn);
+        });
     }
 
     function updateProgress() {
+        const total = activeQuestions.length;
         const pct = Math.min(100, (current / total) * 100);
         progressBar.style.width = pct + '%';
         progressText.textContent = `第 ${Math.min(current+1, total)} 題 / 共 ${total} 題`;
@@ -457,14 +698,14 @@
         questionText.style.display = 'none';
         resultDiv.style.display = 'block';
         resetBtn.style.display = 'block';
-
-        const dims = ['EI','SN','TF','JP'];
+        switchBtn.style.display = 'block';
+        const dims = currentMode === 'full' ? ['EI','SN','TF','JP','AT'] : ['EI','SN','TF','JP'];
         let typeStr = '';
-        let dimHtml = '<div class="section-title">四大核心指標</div>';
+        let dimHtml = `<div class="section-title">${currentMode === 'full' ? '五大核心指標' : '四大核心指標'}</div>`;
         dims.forEach(d => {
             const [a, b] = d.split('');
-            const totalScore = scores[a] + scores[b];
-            const pctA = totalScore ? Math.round((scores[a]/totalScore)*100) : 50;
+            const totalScore = scores[d][a] + scores[d][b];
+            const pctA = totalScore ? Math.round((scores[d][a]/totalScore)*100) : 50;
             const pctB = 100 - pctA;
             const chosen = pctA >= 50 ? a : b;
             typeStr += chosen;
@@ -481,11 +722,13 @@
             `;
         });
         dimensionsDiv.innerHTML = dimHtml;
-        resultType.textContent = `✦ ${typeStr} ✦`;
-        const desc = descriptions[typeStr] || '你的性格獨特，無法簡單歸類。';
+        const baseType = typeStr.slice(0, 4);
+        const displayType = typeStr.length === 5 ? `${baseType}-${typeStr[4]}` : baseType;
+        resultType.textContent = `✦ ${displayType} ✦`;
+        const desc = descriptions[baseType] || '你的性格獨特，無法簡單歸類。';
         descDiv.textContent = desc;
         groupsDiv.innerHTML = '<div class="section-title">16 型人格四大族群</div>' + groups.map(group => {
-            const active = group.types.includes(typeStr);
+            const active = group.types.includes(baseType);
             return `
                 <div class="group-item${active ? ' highlight' : ''}">
                     <div class="group-head">
@@ -502,18 +745,16 @@
     }
 
     resetBtn.addEventListener('click', () => {
-        scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
-        current = 0;
-        resultDiv.style.display = 'none';
-        resetBtn.style.display = 'none';
-        optionsDiv.style.display = 'flex';
-        questionText.style.display = 'block';
-        updateProgress();
-        renderQuestion();
+        startQuiz(currentMode);
     });
 
-    renderQuestion();
-    updateProgress();
+    switchBtn.addEventListener('click', showModeSelect);
+
+    document.querySelectorAll('.mode-option').forEach(btn => {
+        btn.addEventListener('click', () => startQuiz(btn.dataset.mode));
+    });
+
+    showModeSelect();
 </script>
 </body>
 </html>
