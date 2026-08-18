@@ -197,6 +197,61 @@
             border-radius: 20px;
             transition: width 0.8s ease;
         }
+        .dimension-desc {
+            font-size: 13px;
+            color: #7b6b5a;
+            line-height: 1.7;
+            margin: 2px 4px 14px;
+            padding-left: 24px;
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #8B0000;
+            letter-spacing: 2px;
+            margin: 18px 0 10px;
+        }
+        .group-item {
+            padding: 12px 6px;
+            border-bottom: 1px dotted #d4cdc0;
+        }
+        .group-item.highlight {
+            background: #f8f1e4;
+            border-left: 4px solid #8B0000;
+            padding-left: 14px;
+        }
+        .group-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .group-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #3d3228;
+        }
+        .group-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: #fcf9f4;
+            background: #8B0000;
+            border-radius: 4px;
+            padding: 2px 8px;
+            letter-spacing: 1px;
+        }
+        .group-types {
+            font-size: 13px;
+            color: #8B0000;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .group-feature {
+            font-size: 14px;
+            color: #2c241c;
+            line-height: 1.7;
+            margin-top: 4px;
+        }
         #desc {
             background: #fcf9f4;
             border-radius: 8px;
@@ -251,6 +306,7 @@
         <div id="resultType"></div>
         <div id="dimensions"></div>
         <div id="desc"></div>
+        <div id="groups"></div>
     </div>
     <button id="resetBtn">🔄 重新鑑定</button>
 </div>
@@ -298,6 +354,20 @@
         'ENTJ': '果斷有魄力，善於戰略策劃，追求目標實現。'
     };
 
+    const dimensionDescriptions = {
+        EI: '能量來源：外向（E）對比內向（I）——看你習慣從外界互動還是獨處獲得能量。',
+        SN: '接收資訊：實感（S）對比直覺（N）——看你著重具體細節還是抽象的大方向。',
+        TF: '決策依據：理性（T）對比感性（F）——看你做決定時依據客觀邏輯還是人際感受。',
+        JP: '生活方式：系統（J）對比彈性（P）——看你喜歡按部就班的計畫還是隨性應變。'
+    };
+
+    const groups = [
+        { name: '現實主義者 (SP 族群)', types: ['ESTP','ESFP','ISTP','ISFP'], feature: '動作快、適應力強、重視當下的實際體驗。' },
+        { name: '社群主義者 (SJ 族群)', types: ['ESTJ','ESFJ','ISTJ','ISFJ'], feature: '有責任感、重視規矩、喜歡安穩與條理。' },
+        { name: '理性主義者 (NT 族群)', types: ['ENTJ','ENTP','INTJ','INTP'], feature: '聰明、愛思考、追求效率與解決問題。' },
+        { name: '理想主義者 (NF 族群)', types: ['ENFJ','ENFP','INFJ','INFP'], feature: '重視情感、有同理心、追求人生意義與價值。' }
+    ];
+
     let current = 0;
     let scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
     const total = questions.length;
@@ -311,6 +381,7 @@
     const resultType = document.getElementById('resultType');
     const dimensionsDiv = document.getElementById('dimensions');
     const descDiv = document.getElementById('desc');
+    const groupsDiv = document.getElementById('groups');
 
     function renderQuestion() {
         if (current >= total) { showResult(); return; }
@@ -355,7 +426,7 @@
 
         const dims = ['EI','SN','TF','JP'];
         let typeStr = '';
-        let dimHtml = '';
+        let dimHtml = '<div class="section-title">四大核心指標</div>';
         dims.forEach(d => {
             const [a, b] = d.split('');
             const totalScore = scores[a] + scores[b];
@@ -372,12 +443,26 @@
                     <span class="right">${b}</span>
                     <span style="font-size:13px; font-weight:600; margin-left:6px; min-width:36px; color:#3d3228;">${pctA}%</span>
                 </div>
+                <div class="dimension-desc">${dimensionDescriptions[d]}</div>
             `;
         });
         dimensionsDiv.innerHTML = dimHtml;
         resultType.textContent = `✦ ${typeStr} ✦`;
         const desc = descriptions[typeStr] || '你的性格獨特，無法簡單歸類。';
         descDiv.textContent = desc;
+        groupsDiv.innerHTML = '<div class="section-title">16 型人格四大族群</div>' + groups.map(group => {
+            const active = group.types.includes(typeStr);
+            return `
+                <div class="group-item${active ? ' highlight' : ''}">
+                    <div class="group-head">
+                        <span class="group-name">${group.name}</span>
+                        ${active ? '<span class="group-badge">你的族群</span>' : ''}
+                    </div>
+                    <div class="group-types">${group.types.join('、')}</div>
+                    <div class="group-feature">${group.feature}</div>
+                </div>
+            `;
+        }).join('');
         progressBar.style.width = '100%';
         progressText.textContent = '完成';
     }
