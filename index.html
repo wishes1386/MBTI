@@ -281,6 +281,15 @@
             border: 1px solid #3d3228;
         }
         #resetBtn:hover { background: #0f1a22; transform: scale(1.01); box-shadow: 0 4px 12px rgba(26,42,58,0.3); }
+        .source-credit {
+            text-align: center;
+            font-size: 12px;
+            color: #9b8b79;
+            margin-top: 18px;
+        }
+        .source-credit a {
+            color: #8B0000;
+        }
         @media (max-width: 480px) {
             #app { padding: 20px 16px; }
             #questionText { font-size: 18px; }
@@ -293,11 +302,11 @@
 <div id="app">
     <div class="title-wrap">
         <h1>🎌 MBTI 性格鑑定</h1>
-        <div class="sub">16 題 · 請安靜地回答</div>
+        <div class="sub">36 題 · 請安靜地回答</div>
     </div>
 
     <div id="progress"><div id="progressBar"></div></div>
-    <div id="progressText">第 1 題 / 共 16 題</div>
+    <div id="progressText">第 1 題 / 共 36 題</div>
 
     <div id="questionText"></div>
     <div id="options"></div>
@@ -309,6 +318,7 @@
         <div id="groups"></div>
     </div>
     <button id="resetBtn">🔄 重新鑑定</button>
+    <div class="source-credit">題目靈感來源：<a href="https://mbtiusa.com/test" target="_blank" rel="noopener">MBTI USA</a></div>
 </div>
 
 <script>
@@ -332,7 +342,31 @@
         { dim: 'JP', q: '你更喜歡：', opts: ['制定計劃並按計劃執行', '靈活應變隨遇而安'], code: ['J','P'] },
         { dim: 'JP', q: '你更傾向：', opts: ['盡早做決定', '保持開放選項'], code: ['J','P'] },
         { dim: 'JP', q: '生活風格更偏向：', opts: ['有條不紊', '隨意自在'], code: ['J','P'] },
-        { dim: 'JP', q: '你更適應：', opts: ['有明確期限的工作', '無明確期限的工作'], code: ['J','P'] }
+        { dim: 'JP', q: '你更適應：', opts: ['有明確期限的工作', '無明確期限的工作'], code: ['J','P'] },
+
+        { dim: 'EI', q: '排滿社交活動的週末，通常讓你更有能量，而不是筋疲力盡。', opts: ['更有能量', '筋疲力盡'], code: ['E','I'] },
+        { dim: 'EI', q: '即使原本沒有打算加入，你也很容易自然融入對話。', opts: ['很像我的作風', '我通常會先退一步'], code: ['E','I'] },
+        { dim: 'EI', q: '思考問題時，說出來比較容易理清思路。', opts: ['通常是', '我需要先安靜思考'], code: ['E','I'] },
+        { dim: 'EI', q: '你比較喜歡跟別人一起討論一個想法，而不是自己獨自消化。', opts: ['邊說邊想', '獨自思考'], code: ['E','I'] },
+        { dim: 'EI', q: '忙碌一週後，你預設的恢復方式是找人見面，而不是暫時消失。', opts: ['找人見面', '暫時消失一下'], code: ['E','I'] },
+
+        { dim: 'SN', q: '比起只能部分解釋的模式，你更相信經得起驗證的細節。', opts: ['模式優先', '細節優先'], code: ['N','S'] },
+        { dim: 'SN', q: '接觸新領域時，你通常先注意到未來可能性，而不是眼前現實。', opts: ['未來可能性', '眼前現實'], code: ['N','S'] },
+        { dim: 'SN', q: '例子有幫助，但你在意的往往是背後的概念，而不只是具體案例。', opts: ['背後概念', '具體案例'], code: ['N','S'] },
+        { dim: 'SN', q: '比起過去有效的方法，你更容易相信一個正在成形的新想法。', opts: ['新興想法', '已被驗證的方法'], code: ['N','S'] },
+        { dim: 'SN', q: '別人描述事情時，你比較注意它可能代表的意義，而不是實際發生什麼。', opts: ['可能的意義', '實際發生的事'], code: ['N','S'] },
+
+        { dim: 'TF', q: '衝突時，一致性對你來說比維持和諧氛圍更重要。', opts: ['一致性優先', '和諧優先'], code: ['T','F'] },
+        { dim: 'TF', q: '你通常會先想這個決定是否公平合理，再考慮它是否讓人感到溫暖。', opts: ['公平合理', '溫暖體貼'], code: ['T','F'] },
+        { dim: 'TF', q: '給回饋時，你寧可直接說清楚，也不想把話講得太委婉。', opts: ['直接明確', '委婉表達'], code: ['T','F'] },
+        { dim: 'TF', q: '有力的論證比感人的個人故事更能說服你。', opts: ['有力論證', '感人的故事'], code: ['T','F'] },
+        { dim: 'TF', q: '你的第一反應是解決問題，情緒可以之後再處理。', opts: ['先解決問題', '先照顧感受'], code: ['T','F'] },
+
+        { dim: 'JP', q: '計畫事先確定下來時，你覺得比較安心。', opts: ['保持彈性', '提早決定'], code: ['P','J'] },
+        { dim: 'JP', q: '留有調整空間的粗略計畫，比排死的行程更讓你舒服。', opts: ['彈性計畫', '固定行程'], code: ['P','J'] },
+        { dim: 'JP', q: '你寧可早點完成，也不想無限修改下去。', opts: ['繼續完善', '早點完成'], code: ['P','J'] },
+        { dim: 'JP', q: '臨時改變通常讓你覺得刺激，而不是困擾。', opts: ['刺激', '困擾'], code: ['P','J'] },
+        { dim: 'JP', q: '你傾向盡量保持選項開放，直到不得不決定的最後一刻。', opts: ['保持開放', '早點定案'], code: ['P','J'] }
     ];
 
     const descriptions = {
